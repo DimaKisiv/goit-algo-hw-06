@@ -32,40 +32,23 @@ def dfs_iterative(graph, start_vertex, goal_vertex):
     return None 
 
 def bfs_recursive(graph, queue, goal_vertex, visited=None):
-    # Перевіряємо, чи передана черга є рядком, і перетворюємо її на deque
     if isinstance(queue, str):
         queue = deque([(queue, [queue])])
-
-    # Ініціалізуємо відвідані вершини, якщо вони не були передані
     if visited is None:
         visited = set()
-
-    # Якщо черга порожня, завершуємо рекурсію
     if not queue:
         return None
-
-    # Вилучаємо вершину з початку черги разом з її шляхом
     vertex, path = queue.popleft()
-
-    # Перевіряємо, чи була вершина відвідана раніше
     if vertex not in visited:
-        visited.add(vertex)  # Відмічаємо вершину як відвідану
-
-        # Якщо знайшли цільову вершину, повертаємо шлях до неї
+        visited.add(vertex)  
         if vertex == goal_vertex:
             return path
 
-        # Додаємо невідвіданих сусідів даної вершини в кінець черги з оновленим шляхом
         for neighbor in graph[vertex]:
             if neighbor not in visited:
                 queue.append((neighbor, path + [neighbor]))
 
-    # Рекурсивний виклик функції з оновленою чергою і відвіданими вершинами
     return bfs_recursive(graph, queue, goal_vertex, visited)
-
-
-
-
 
 def bfs_iterative(graph, start_vertex, goal_vertex):
     visited = set()
@@ -80,3 +63,24 @@ def bfs_iterative(graph, start_vertex, goal_vertex):
                 if neighbor not in visited:
                     queue.append((neighbor, path + [neighbor]))
     return None
+
+
+def dijkstra(graph, start):
+    distances = {vertex: float('infinity') for vertex in graph.nodes()}
+    distances[start] = 0
+    visited = set()
+    while len(visited) < len(graph.nodes()):
+        min_vertex = None
+        for vertex in graph.nodes():
+            if vertex not in visited:
+                if min_vertex is None or distances[vertex] < distances[min_vertex]:
+                    min_vertex = vertex
+        if distances[min_vertex] == float('infinity'):
+            break
+        visited.add(min_vertex)
+        for neighbor in graph.neighbors(min_vertex):
+            weight = graph[min_vertex][neighbor]['weight']
+            new_distance = distances[min_vertex] + weight
+            if new_distance < distances[neighbor]:
+                distances[neighbor] = new_distance
+    return distances
